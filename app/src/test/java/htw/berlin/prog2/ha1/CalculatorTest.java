@@ -102,5 +102,23 @@ class CalculatorTest {
         assertEquals("5", calc.readScreen());
     }
 
+    @Test
+    @DisplayName("should apply the last operation with the last operand when pressing equals multiple times")
+    void testMultipleEquals() {
+        Calculator calc = new Calculator();
+        calc.pressDigitKey(2);
+        calc.pressBinaryOperationKey("+");
+        calc.pressDigitKey(3);
+        calc.pressEqualsKey();
+        assertEquals("5", calc.readScreen());
+        calc.pressEqualsKey();
+        assertEquals("8", calc.readScreen());
+        calc.pressEqualsKey();
+        assertEquals("11", calc.readScreen());
+    }
+
+
+
+
 }
 
