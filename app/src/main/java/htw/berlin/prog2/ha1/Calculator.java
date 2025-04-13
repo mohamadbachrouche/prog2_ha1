@@ -14,6 +14,9 @@ public class Calculator {
 
     private String latestOperation = "";
 
+    private double lastSecondOperand;       // New: Stores the second operand for repeated equals
+    private boolean isAfterEquals = false;  // New: Tracks if equals was pressed last
+
     /**
      * @return den aktuellen Bildschirminhalt als String
      */
@@ -30,6 +33,8 @@ public class Calculator {
      */
     public void pressDigitKey(int digit) {
         if(digit > 9 || digit < 0) throw new IllegalArgumentException();
+
+        isAfterEquals = false;  // Reset after equals state
 
         if(screen.equals("0") || latestValue == Double.parseDouble(screen)) screen = "";
 
@@ -62,6 +67,7 @@ public class Calculator {
     public void pressBinaryOperationKey(String operation)  {
         latestValue = Double.parseDouble(screen);
         latestOperation = operation;
+        isAfterEquals = false;  // Reset after equals state
     }
 
     /**
@@ -118,16 +124,27 @@ public class Calculator {
      * und das Ergebnis direkt angezeigt.
      */
     public void pressEqualsKey() {
-        var result = switch(latestOperation) {
-            case "+" -> latestValue + Double.parseDouble(screen);
-            case "-" -> latestValue - Double.parseDouble(screen);
-            case "x" -> latestValue * Double.parseDouble(screen);
-            case "/" -> latestValue / Double.parseDouble(screen);
-            default -> throw new IllegalArgumentException();
+        double currentScreenValue = Double.parseDouble(screen);
+
+        if (!isAfterEquals) {
+            lastSecondOperand = currentScreenValue;
+        }
+
+        double result = switch (latestOperation) {
+            case "+" -> latestValue + lastSecondOperand;
+            case "-" -> latestValue - lastSecondOperand;
+            case "x" -> latestValue * lastSecondOperand;
+            case "/" -> (lastSecondOperand == 0) ? Double.NaN : latestValue / lastSecondOperand;
+            default -> currentScreenValue;
         };
+
         screen = Double.toString(result);
-        if(screen.equals("Infinity")) screen = "Error";
-        if(screen.endsWith(".0")) screen = screen.substring(0,screen.length()-2);
-        if(screen.contains(".") && screen.length() > 11) screen = screen.substring(0, 10);
+
+        if (screen.equals("NaN")) screen = "Error";
+        if (screen.endsWith(".0")) screen = screen.substring(0, screen.length() - 2);
+        if (screen.contains(".") && screen.length() > 11) screen = screen.substring(0, 10);
+
+        latestValue = result;
+        isAfterEquals = true;
     }
 }
