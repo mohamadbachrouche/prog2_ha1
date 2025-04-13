@@ -15,7 +15,10 @@ public class Calculator {
     private String latestOperation = "";
 
     private double lastSecondOperand;       // New: Stores the second operand for repeated equals
+
     private boolean isAfterEquals = false;  // New: Tracks if equals was pressed last
+
+    private boolean isClearPressed = false; // New: Tracks consecutive clear presses
 
     /**
      * @return den aktuellen Bildschirminhalt als String
@@ -35,6 +38,7 @@ public class Calculator {
         if(digit > 9 || digit < 0) throw new IllegalArgumentException();
 
         isAfterEquals = false;  // Reset after equals state
+        isClearPressed = false; // Reset clear state
 
         if(screen.equals("0") || latestValue == Double.parseDouble(screen)) screen = "";
 
@@ -49,10 +53,19 @@ public class Calculator {
      * Werte sowie der aktuelle Operationsmodus zurückgesetzt, so dass der Rechner wieder
      * im Ursprungszustand ist.
      */
+
     public void pressClearKey() {
-        screen = "0";
-        latestOperation = "";
-        latestValue = 0.0;
+        if (isClearPressed) {
+            // Second press: full reset
+            screen = "0";
+            latestOperation = "";
+            latestValue = 0.0;
+            isClearPressed = false;
+        } else {
+            // First press: clear screen only
+            screen = "0";
+            isClearPressed = true;
+        }
     }
 
     /**
@@ -68,6 +81,7 @@ public class Calculator {
         latestValue = Double.parseDouble(screen);
         latestOperation = operation;
         isAfterEquals = false;  // Reset after equals state
+        isClearPressed = false; // Reset clear state
     }
 
     /**
@@ -89,6 +103,7 @@ public class Calculator {
         screen = Double.toString(result);
         if(screen.equals("NaN")) screen = "Error";
         if(screen.contains(".") && screen.length() > 11) screen = screen.substring(0, 10);
+        isClearPressed = false; // Reset clear state
 
     }
 
@@ -100,7 +115,9 @@ public class Calculator {
      * Beim zweimaligem Drücken, oder wenn bereits ein Trennzeichen angezeigt wird, passiert nichts.
      */
     public void pressDotKey() {
+
         if(!screen.contains(".")) screen = screen + ".";
+        isClearPressed = false; // Reset clear state
     }
 
     /**
@@ -112,6 +129,7 @@ public class Calculator {
      */
     public void pressNegativeKey() {
         screen = screen.startsWith("-") ? screen.substring(1) : "-" + screen;
+        isClearPressed = false; // Reset clear state
     }
 
     /**
