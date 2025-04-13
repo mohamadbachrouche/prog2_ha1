@@ -90,5 +90,17 @@ class CalculatorTest {
 
 
     //TODO hier weitere Tests erstellen
+
+    @Test
+    @DisplayName("should toggle the sign of the number")
+    void testNegativeKey() {
+        Calculator calc = new Calculator();
+        calc.pressDigitKey(5);
+        calc.pressNegativeKey();
+        assertEquals("-5", calc.readScreen());
+        calc.pressNegativeKey();
+        assertEquals("5", calc.readScreen());
+    }
+
 }
 
